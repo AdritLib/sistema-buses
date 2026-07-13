@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 import org.springframework.http.ProblemDetail;
 
-import com.sistema_buses.exception.ProblemDetailException;
+import com.sistema_buses.exception.ProblemaDetallesException;
 
 import feign.Response;
 import feign.codec.ErrorDecoder;
@@ -22,7 +22,7 @@ public class ProblemExceptionDecoder implements ErrorDecoder{
     public Exception decode(String methodKey, Response response) {
         try (InputStream bodyIs = response.body().asInputStream()) {
             ProblemDetail problemDetail = mapper.readValue(bodyIs, ProblemDetail.class);
-            return new ProblemDetailException(problemDetail);
+            return new ProblemaDetallesException(problemDetail);
         } catch (IOException e) {
             return new ProblemExceptionDecoder.Default().decode(methodKey, response);
         }

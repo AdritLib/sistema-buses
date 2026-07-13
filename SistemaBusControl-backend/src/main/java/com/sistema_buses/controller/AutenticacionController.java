@@ -1,6 +1,7 @@
 package com.sistema_buses.controller;
 
 import com.sistema_buses.dto.usuario.LoginResponse;
+import com.sistema_buses.dto.usuario.UsuarioCambiarClaveRequest;
 import com.sistema_buses.dto.usuario.UsuarioLogin;
 import com.sistema_buses.service.autenticacion.AuthenticationService;
 
@@ -31,5 +32,12 @@ public class AutenticacionController {
     @GetMapping("/validar")
     public ResponseEntity<Void> validar(){
     	return ResponseEntity.ok().build();
+    }
+    
+    @Operation(summary = "Cambiar clave", description = "Cambia la clave de un usuario.")
+    @PostMapping("/cambiarClave")
+    public ResponseEntity<Void> cambiarClave(@RequestBody UsuarioCambiarClaveRequest request){
+    	authenticationService.cambiarClave(request);
+    	return ResponseEntity.noContent().build();
     }
 }

@@ -4,9 +4,10 @@ package com.sistema_buses.controller;
 import com.sistema_buses.client.AuthClient;
 import com.sistema_buses.client.UsuarioClient;
 import com.sistema_buses.dto.usuario.LoginResponse;
+import com.sistema_buses.dto.usuario.UsuarioCambiarClaveRequest;
 import com.sistema_buses.dto.usuario.UsuarioCompletoResponse;
 import com.sistema_buses.dto.usuario.UsuarioLogin;
-import com.sistema_buses.exception.ProblemDetailException;
+import com.sistema_buses.exception.ProblemaDetallesException;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -60,7 +61,7 @@ public class AuthController {
             }
             
             return "login";
-        } catch (ProblemDetailException e) {
+        } catch (ProblemaDetallesException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Ocurrio un error en la aplicación.");
@@ -72,5 +73,26 @@ public class AuthController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
+    }
+    
+    @GetMapping("/cambiarClave")
+    public String cambiarClave(Model model) {
+    	model.addAttribute("peticion", new UsuarioCambiarClaveRequest());
+    	return "cambiarClave";
+    }
+    
+    @PostMapping("/cambiarClave")
+    public String procesarCambiarClave(@ModelAttribute UsuarioCambiarClaveRequest peticion, RedirectAttributes redirect) {
+    	try {
+    		authClient.cambiarClave(peticion);
+    		redirect.addFlashAttribute("mensaje", "Cambio de clave exitoso. Inicie sesión.");
+            return "redirect:/login";
+        } catch (ProblemaDetallesException e) {
+        	boolean vacio = e.getMessage() == null || e.getMessage().isBlank();
+        	redirect.addFlashAttribute("error", vacio ? "Ocurrio un error en la aplicación." : e.getMessage());
+        } catch (Exception e) {
+        	redirect.addFlashAttribute("error", "Ocurrio un error en la aplicación.");
+        }
+    	return "redirect:/cambiarClave";
     }
 }

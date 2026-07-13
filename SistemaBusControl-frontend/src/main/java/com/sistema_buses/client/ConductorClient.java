@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.sistema_buses.config.FeignConfig;
+import com.sistema_buses.config.AppFrontConfig;
 import com.sistema_buses.dto.asignacion.AsignacionConductorResponse;
 import com.sistema_buses.dto.recorrido.RecorridoConductorResponse;
 import com.sistema_buses.dto.ruta.RutaConductorResponse;
 import com.sistema_buses.dto.vehiculo.VehiculoResponse;
 
-@FeignClient(name = "conductor-client", url = "${backend.base-url}/api", configuration = FeignConfig.class)
+@FeignClient(name = "conductor-client", url = "${backend.base-url}/api", configuration = AppFrontConfig.class)
 public interface ConductorClient {
 
     @GetMapping("/conductor/{idUsuario}/asignacion-activa")

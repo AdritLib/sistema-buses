@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.sistema_buses.config.FeignConfig;
+import com.sistema_buses.config.AppFrontConfig;
 import com.sistema_buses.dto.paradero.ParaderoConductorResponse;
 import com.sistema_buses.dto.recorrido.IniciarRecorridoRequest;
 import com.sistema_buses.dto.recorrido.MarcarLlegadaRequest;
 import com.sistema_buses.dto.recorrido.RecorridoConductorResponse;
 
-@FeignClient(name = "recorrido-conductor-client", url = "${backend.base-url}/api", configuration = FeignConfig.class)
+@FeignClient(name = "recorrido-conductor-client", url = "${backend.base-url}/api", configuration = AppFrontConfig.class)
 public interface RecorridoConductorClient {
 
     @GetMapping("/recorridos/{idRecorrido}")

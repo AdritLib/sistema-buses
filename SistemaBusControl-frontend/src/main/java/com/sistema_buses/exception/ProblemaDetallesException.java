@@ -2,11 +2,11 @@ package com.sistema_buses.exception;
 
 import org.springframework.http.ProblemDetail;
 
-public class ProblemDetailException extends RuntimeException {
+public class ProblemaDetallesException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	private final ProblemDetail problemDetail;
 
-    public ProblemDetailException(ProblemDetail problemDetail) {
+    public ProblemaDetallesException(ProblemDetail problemDetail) {
         super(problemDetail.getDetail());
         this.problemDetail = problemDetail;
     }

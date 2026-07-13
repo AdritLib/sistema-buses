@@ -23,21 +23,15 @@
         </section>
 
         <section class="login-form-panel">
-            <p class="eyebrow small fw-bold text-uppercase mb-2">Bienvenido</p>
-            <h2 class="h3 fw-bold mb-2">Inicia sesión</h2>
-            <p class="text-secondary mb-4">Ingresa tus credenciales para continuar.</p>
+            <p class="eyebrow small fw-bold text-uppercase mb-2">¿Olvidaste tú clave?</p>
+            <h2 class="h3 fw-bold mb-4">Cambiar clave</h2>
 
             <div th:if="${error}" class="alert alert-danger border-0 rounded-3 d-flex align-items-center" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
                 <span th:text="${error}">No fue posible iniciar sesión.</span>
             </div>
-			
-			<div th:if="${mensaje}" class="alert alert-primary border-0 rounded-3 d-flex align-items-center">
-                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
-                <span th:text="${mensaje}"></span>
-            </div>
 
-            <form th:action="@{/login}" th:object="${loginData}" method="post">
+            <form th:action="@{/cambiarClave}" th:object="${peticion}" method="post">
                 <div class="mb-3">
                     <label for="correo" class="form-label fw-semibold">Correo electrónico</label>
                     <div class="input-group">
@@ -46,17 +40,24 @@
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label for="password" class="form-label fw-semibold">Contraseña</label>
+                    <label for="password" class="form-label fw-semibold">Clave</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock text-secondary"></i></span>
-                        <input type="password" id="clave" th:field="*{clave}" class="form-control border-start-0 py-2" placeholder="Tu contraseña" required autocomplete="current-password">
+                        <input type="password" id="clave" th:field="*{clave}" class="form-control border-start-0 py-2" placeholder="Tu clave anterior" required autocomplete="current-password">
+                    </div>
+                </div>
+				<div class="mb-4">
+                    <label for="password" class="form-label fw-semibold">Nueva Clave</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock text-secondary"></i></span>
+                        <input type="password" id="nuevaClave" th:field="*{nuevaClave}" class="form-control border-start-0 py-2" placeholder="Tu clave nueva" required>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary w-100 mb-4 fw-bold py-2 rounded-3">
-                    Iniciar sesión <i class="bi bi-arrow-right ms-2"></i>
+                    Procesar cambio <i class="bi bi-arrow-right ms-2"></i>
                 </button>
-				<a th:href="@{/cambiarClave}" class="link-secondary w-100 fw-bold py-2 rounded-3">
-                    Olvide mi clave de acceso
+				<a th:href="@{/login}" class="link-secondary w-100 fw-bold py-2 rounded-3">
+                    Regresar a iniciar sesión
                 </a>
             </form>
         </section>

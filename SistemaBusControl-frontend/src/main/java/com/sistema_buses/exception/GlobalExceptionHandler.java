@@ -18,8 +18,8 @@ public class GlobalExceptionHandler {
         return "redirect:/error";
     }
     
-    @ExceptionHandler(ProblemDetailException.class)
-    public String handleProblemDetailException(ProblemDetailException e, RedirectAttributes redirect) {
+    @ExceptionHandler(ProblemaDetallesException.class)
+    public String handleProblemDetailException(ProblemaDetallesException e, RedirectAttributes redirect) {
     	redirect.addFlashAttribute("errorTitulo", e.getProblemDetail().getTitle());
     	redirect.addFlashAttribute("errorMensaje", e.getProblemDetail().getDetail());
     	redirect.addFlashAttribute("errorEstatus", 500);

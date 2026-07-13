@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-import com.sistema_buses.config.FeignConfig;
+import com.sistema_buses.config.AppFrontConfig;
 import com.sistema_buses.dto.asignacion.AsignacionRequest;
 import com.sistema_buses.dto.asignacion.AsignacionResponse;
 
-@FeignClient(name = "asignacion-client", url = "${backend.base-url}/api", configuration = FeignConfig.class)
+@FeignClient(name = "asignacion-client", url = "${backend.base-url}/api", configuration = AppFrontConfig.class)
 public interface AsignacionClient {
 
 	@GetMapping("/asignacion")

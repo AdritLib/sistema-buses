@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.sistema_buses.config.FeignConfig;
+import com.sistema_buses.config.AppFrontConfig;
 import com.sistema_buses.dto.vehiculo.VehiculoMantenimientoRequest;
 import com.sistema_buses.dto.vehiculo.VehiculoMantenimientoResponse;
 
-@FeignClient(name = "vehiculo-mantenimiento-client", url = "${backend.base-url}/api/vehiculo/mantenimiento", configuration = FeignConfig.class)
+@FeignClient(name = "vehiculo-mantenimiento-client", url = "${backend.base-url}/api/vehiculo/mantenimiento", configuration = AppFrontConfig.class)
 public interface VehiculoMantenimientoClient {
 
 	@GetMapping

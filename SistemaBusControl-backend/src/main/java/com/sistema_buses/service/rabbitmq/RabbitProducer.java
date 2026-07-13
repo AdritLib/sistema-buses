@@ -33,4 +33,15 @@ public class RabbitProducer {
 	public void enviar(RegistroAccion accion, String entidadAfectada) {
 		enviar(accion, "Se "+accion.verbo()+" en la tabla de la entidad "+entidadAfectada, entidadAfectada);
 	}
+	
+	public void enviar(RegistroAccion accion, String descripcion, Long usuarioId, String entidadAfectada) {
+		Registro registro = new Registro();
+		registro.setAccion(accion);
+		registro.setEntidadAfectada(entidadAfectada);
+		registro.setDescripcion(descripcion);
+		registro.setUsuarioID(usuarioId);
+		registro.setFecha(LocalDateTime.now());
+		
+		template.convertAndSend(RabbitMQConfig.COLA, registro);
+	}
 }

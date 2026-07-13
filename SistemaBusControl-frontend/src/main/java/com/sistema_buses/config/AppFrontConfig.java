@@ -7,7 +7,7 @@ import feign.RequestInterceptor;
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration
-public class FeignConfig {
+public class AppFrontConfig {
 
     @Bean
     ProblemExceptionDecoder errorDecoder(ObjectMapper objectMapper) {

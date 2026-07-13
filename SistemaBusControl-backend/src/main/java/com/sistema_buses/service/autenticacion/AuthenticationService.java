@@ -1,10 +1,12 @@
 package com.sistema_buses.service.autenticacion;
 
 import com.sistema_buses.dto.usuario.LoginResponse;
+import com.sistema_buses.dto.usuario.UsuarioCambiarClaveRequest;
 import com.sistema_buses.dto.usuario.UsuarioLogin;
 import com.sistema_buses.dto.usuario.UsuarioRequest;
 import com.sistema_buses.dto.usuario.UsuarioResponse;
 import com.sistema_buses.enums.RegistroAccion;
+import com.sistema_buses.exception.ErrorDeNegocioException;
 import com.sistema_buses.exception.RolNoEncontradoException;
 import com.sistema_buses.exception.UsuarioNoEncontradoException;
 import com.sistema_buses.model.Rol;
@@ -78,4 +80,16 @@ public class AuthenticationService {
         LoginResponse respuesta = new LoginResponse(jwtService.generateToken(details), jwtService.getExpirationTime());
         return respuesta;
     }
+    
+	@Transactional
+	public void cambiarClave(UsuarioCambiarClaveRequest request) {
+		if(request.getCorreo() == null) throw new ErrorDeNegocioException("Debes ingresar un correo electrónico.");
+		Usuario usuario = userRepository.findByCorreo(request.getCorreo()).orElseThrow(() -> new UsuarioNoEncontradoException());
+		if(!passwordEncoder.matches(request.getClave(), usuario.getClave())) throw new ErrorDeNegocioException("Clave ingresada incorrecta.");
+		String nueva = passwordEncoder.encode(request.getNuevaClave());
+		if(nueva.equals(usuario.getClave())) throw new ErrorDeNegocioException("Estas enviando la misma clave.");
+		usuario.setClave(nueva);
+		Usuario guardado = userRepository.save(usuario);
+		producer.enviar(RegistroAccion.CAMBIO_CLAVE, "Cambio de clave del usuario ID="+guardado.getId()+", Correo="+guardado.getCorreo(), guardado.getId(), nombreEntidad);
+	}
 }
