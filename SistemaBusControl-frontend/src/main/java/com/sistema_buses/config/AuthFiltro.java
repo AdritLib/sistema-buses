@@ -1,6 +1,7 @@
 package com.sistema_buses.config;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
@@ -11,9 +12,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class AuthFiltro extends OncePerRequestFilter{
+	
+	private static final List<String> RUTAS_PUBLICAS = List.of(
+        "/css/", "/js/", "/images/", "/login", "/cambiarClave", "/logout"
+    );
+	
 	private static final Map<String, String> MAPA_ROL_ACCESO = Map.of(
         "/admin/", "ADMIN",
         "/supervisor/", "SUPERVISOR",
@@ -23,7 +31,7 @@ public class AuthFiltro extends OncePerRequestFilter{
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return path.startsWith("/css") || path.equals("/login") || path.equals("/cambiarClave") || path.equals("/logout");
+        return RUTAS_PUBLICAS.stream().anyMatch(path::startsWith);
     }
 
 	@Override
@@ -32,9 +40,26 @@ public class AuthFiltro extends OncePerRequestFilter{
         HttpSession session = request.getSession(false);
 
     	if (session == null || session.getAttribute("token") == null || session.getAttribute("rol") == null) {
-    		response.sendRedirect(request.getContextPath() + "/login");
+    		redirigirLogin(request, response);
             return;
         }
+    	
+    	Long expiresIn = (Long) session.getAttribute("expires-in");
+        long tiempoActual = System.currentTimeMillis();
+        //											(esto es el margen)
+        if (expiresIn == null || tiempoActual >= (expiresIn - 5000)) {
+            session.invalidate();
+            redirigirLogin(request, response);
+            return;
+        }
+    	
+    	/*try {
+    		//usuarioClient.validar();
+    	}catch(Exception e) {
+    		session.invalidate();
+    		redirigirLogin(request, response);
+            return;
+    	}*/
     	
     	String rol = (String) session.getAttribute("rol");
     	String path = request.getRequestURI();
@@ -48,4 +73,8 @@ public class AuthFiltro extends OncePerRequestFilter{
         
     	filterChain.doFilter(request, response);
     }
+	
+	private void redirigirLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		response.sendRedirect(request.getContextPath() + "/login");
+	}
 }

@@ -135,11 +135,11 @@ public class SupervisorViewController {
 
 	@PostMapping("/asignaciones/guardar")
 	public String guardarAsignacion(@RequestParam(required = false) Long id,
-			@ModelAttribute AsignacionRequest request, HttpSession session) {
+			@ModelAttribute AsignacionRequest asignacionForm, HttpSession session) {
 		if (id == null) {
-			asignacionClient.registrarAsignacion(request);
+			asignacionClient.registrarAsignacion(asignacionForm);
 		} else {
-			asignacionClient.actualizarAsignacion(id, request);
+			asignacionClient.actualizarAsignacion(id, asignacionForm);
 		}
 
 		return "redirect:/supervisor/asignaciones";
@@ -162,6 +162,7 @@ public class SupervisorViewController {
 				form.setFecha(a.getFecha());
 				form.setHoraInicio(a.getHoraInicio());
 				form.setHoraFin(a.getHoraFin());
+				form.setEstado(a.getEstado());
 			}
 
 		} catch (Exception e) {

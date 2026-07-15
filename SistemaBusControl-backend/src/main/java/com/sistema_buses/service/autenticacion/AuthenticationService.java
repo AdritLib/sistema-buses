@@ -9,12 +9,15 @@ import com.sistema_buses.enums.RegistroAccion;
 import com.sistema_buses.exception.ErrorDeNegocioException;
 import com.sistema_buses.exception.RolNoEncontradoException;
 import com.sistema_buses.exception.UsuarioNoEncontradoException;
+import com.sistema_buses.mapper.UsuarioMapper;
 import com.sistema_buses.model.Rol;
 import com.sistema_buses.model.UserDetailsImpl;
 import com.sistema_buses.model.Usuario;
 import com.sistema_buses.repository.RolRepository;
 import com.sistema_buses.repository.UsuarioRepository;
 import com.sistema_buses.service.rabbitmq.RabbitProducer;
+
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationService {
     private final UsuarioRepository userRepository;
     private final RolRepository roleRepository;
@@ -31,21 +35,25 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final RabbitProducer producer;
 	private final String nombreEntidad = "Auth";
+	@Lazy
     private final AuthenticationManager authenticationManager;
-    
+    private final UsuarioMapper usuarioMapper;
+    /*
     public AuthenticationService(UsuarioRepository userRepository, 
     		RolRepository roleRepository,
 			PasswordEncoder passwordEncoder, 
 			JwtService jwtService,
 			@Lazy AuthenticationManager authenticationManager,
-			RabbitProducer producer) {
+			RabbitProducer producer,
+			UsuarioMapper usuarioMapper) {
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtService = jwtService;
 		this.authenticationManager = authenticationManager;
 		this.producer = producer;
-	}
+		this.usuarioMapper = usuarioMapper;
+	}*/
 
     @Transactional
 	public UsuarioResponse signup(UsuarioRequest request) {
@@ -63,13 +71,7 @@ public class AuthenticationService {
         Usuario guardado = userRepository.save(user);
         producer.enviar(RegistroAccion.INSERTAR, nombreEntidad);
         
-        return UsuarioResponse.builder()
-        		.correo(guardado.getCorreo())
-        		.nombre(guardado.getNombre())
-        		.rol(guardado.getRol().getNombre().name())
-        		.id(guardado.getId())
-        		.activo(guardado.isActivo())
-        		.build();
+        return usuarioMapper.toResponse(guardado);
     }
 
     public LoginResponse login(UsuarioLogin login) {
@@ -77,7 +79,8 @@ public class AuthenticationService {
         Usuario user = userRepository.findByCorreo(login.getCorreo()).orElseThrow(() 
         		-> new UsuarioNoEncontradoException(login.getCorreo()));
         UserDetailsImpl details = new UserDetailsImpl(user);
-        LoginResponse respuesta = new LoginResponse(jwtService.generateToken(details), jwtService.getExpirationTime());
+        String token = jwtService.generateToken(details);
+        LoginResponse respuesta = new LoginResponse(token, jwtService.expiresIn(token));
         return respuesta;
     }
     

@@ -49,4 +49,7 @@ public interface UsuarioClient {
     
     @PutMapping("/{id}")
     UsuarioResponse actualizar(@PathVariable Long id, @RequestBody UsuarioRequest request);
+    
+    @GetMapping("/validar")
+    void validar();
 }

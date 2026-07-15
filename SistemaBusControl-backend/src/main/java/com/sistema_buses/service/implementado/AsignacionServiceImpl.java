@@ -9,19 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sistema_buses.config.ApplicationConfig;
 import com.sistema_buses.dto.asignacion.AsignacionRequest;
 import com.sistema_buses.dto.asignacion.AsignacionResponse;
-import com.sistema_buses.enums.GenericoEstado;
 import com.sistema_buses.enums.RegistroAccion;
-import com.sistema_buses.exception.ErrorDeNegocioException;
-import com.sistema_buses.exception.UsuarioNoEncontradoException;
-import com.sistema_buses.exception.VehiculoNoEncontradoException;
+import com.sistema_buses.exception.AsignacionNoEncontradoException;
+import com.sistema_buses.mapper.AsignacionMapper;
 import com.sistema_buses.model.Asignacion;
-import com.sistema_buses.model.Ruta;
-import com.sistema_buses.model.Usuario;
-import com.sistema_buses.model.Vehiculo;
 import com.sistema_buses.repository.AsignacionRepository;
-import com.sistema_buses.repository.RutaRepository;
-import com.sistema_buses.repository.UsuarioRepository;
-import com.sistema_buses.repository.VehiculoRepository;
 import com.sistema_buses.service.AsignacionService;
 import com.sistema_buses.service.rabbitmq.RabbitProducer;
 
@@ -31,12 +23,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AsignacionServiceImpl implements AsignacionService {
 	private final AsignacionRepository asignacionRepository;
-	private final UsuarioRepository usuarioRepository;
-	private final RutaRepository rutaRepository;
-	private final VehiculoRepository vehiculoRepository;
 	private final RabbitProducer producer;
 	private final ApplicationConfig config;
 	private final String nombreEntidad = "Asignacion";
+	private final AsignacionMapper asignacionMapper;
 	
 	@Override
 	public List<AsignacionResponse> listar(int pagina) {
@@ -70,16 +60,20 @@ public class AsignacionServiceImpl implements AsignacionService {
 	
 	@Transactional
 	public AsignacionResponse guardar(Long asignacionID, AsignacionRequest request) {
-		Asignacion entidad;
+		Asignacion entidad = asignacionMapper.toEntity(request);
 		RegistroAccion accion;
+		
 		if(asignacionID == null) {
-			entidad = new Asignacion();
 			accion = RegistroAccion.INSERTAR;
 		}else {
-			entidad = asignacionRepository.findById(asignacionID).orElseThrow();
+			if(asignacionRepository.existsById(asignacionID)){
+				entidad.setId(asignacionID);
+			}else {
+				throw new AsignacionNoEncontradoException(asignacionID);
+			}
 			accion = RegistroAccion.ACTUALIZAR;
 		}
-		
+		/*
 		Usuario conductor = usuarioRepository.findById(request.getConductorID()).orElseThrow(UsuarioNoEncontradoException::new);
 		entidad.setConductor(conductor);
 
@@ -90,35 +84,23 @@ public class AsignacionServiceImpl implements AsignacionService {
 		entidad.setVehiculo(vehiculo);
 		
 		entidad.setFecha(request.getFecha());
-		
 		entidad.setHoraInicio(request.getHoraInicio());
 		entidad.setHoraFin(request.getHoraFin());
-		entidad.setEstado(GenericoEstado.ACTIVO);
+		entidad.setEstado(request.getEstado());*/
 		
 		Asignacion guardado = asignacionRepository.save(entidad);
 		producer.enviar(accion, nombreEntidad);
-		return mapear(guardado);
+
+		return asignacionMapper.toResponse(guardado);
 	}
 
 	@Override
 	public void eliminarPorID(Long id) {
 		Asignacion entidad = asignacionRepository.findById(id)
-				.orElseThrow(() -> new ErrorDeNegocioException("Asignación no encontrada"));
+				.orElseThrow(() -> new AsignacionNoEncontradoException());
 
 		asignacionRepository.delete(entidad);
 
 		producer.enviar(RegistroAccion.ELIMINAR, nombreEntidad);
-	}
-	
-	public AsignacionResponse mapear(Asignacion guardado) {
-		return AsignacionResponse.builder()
-				.fecha(guardado.getFecha())
-				.conductorID(guardado.getConductor().getId())
-				.conductorNombre(guardado.getConductor().getNombre())
-				.horaFin(guardado.getHoraFin())
-				.horaInicio(guardado.getHoraInicio())
-				.rutaID(guardado.getRuta().getId())
-				.id(guardado.getId())
-				.build();
 	}
 }

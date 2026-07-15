@@ -25,5 +25,7 @@ public class AsignacionRequest {
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate fecha;
+	
+	private String estado;
 
 }

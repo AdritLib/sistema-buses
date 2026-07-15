@@ -35,7 +35,8 @@ public interface AsignacionRepository extends JpaRepository<Asignacion, Long>{
 		        v.placa,
 		        a.horaInicio,
 		        a.horaFin,
-		        a.fecha
+		        a.fecha,
+		        a.estado
 		    )
 		    FROM Asignacion a
 		    JOIN a.conductor u
@@ -55,7 +56,8 @@ public interface AsignacionRepository extends JpaRepository<Asignacion, Long>{
 		        v.placa,
 		        a.horaInicio,
 		        a.horaFin,
-		        a.fecha
+		        a.fecha,
+		        a.estado
 		    )
 		    FROM Asignacion a
 		    JOIN a.conductor u

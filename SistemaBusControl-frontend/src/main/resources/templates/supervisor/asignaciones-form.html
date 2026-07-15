@@ -80,16 +80,21 @@
 							<label class="form-label">Hora Fin</label>
 							<input type="time" th:field="*{horaFin}" class="form-control" required>
 						</div>
+						<input th:if="${modo == 'crear'}" type="hidden" th:field="*{estado}" th:value="'ACTIVO'"/>
+						<div th:if="${modo == 'editar'}" class="mb-3">
+							<label class="form-label">Estado</label>
+							<select class="form-select" th:field="*{estado}" required>
+								<option value="" disabled>Seleccione</option>
+								<option selected value="ACTIVO">ACTIVO</option>
+								<option value="MANTENIMIENTO">MANTENIMIENTO</option>
+								<option value="INACTIVO">INACTIVO</option>
+							</select>
+						</div>
 					</div>
 
 					<div class="d-flex gap-2">
-						<button type="submit" class="btn btn-primary">
-							Guardar
-						</button>
-
-						<a th:href="@{/supervisor/asignaciones}" class="btn btn-secondary">
-							Cancelar
-						</a>
+						<button type="submit" class="btn btn-primary">Guardar</button>
+						<a th:href="@{/supervisor/asignaciones}" class="btn btn-secondary">Cancelar</a>
 					</div>
 
 				</form>

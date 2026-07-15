@@ -15,9 +15,10 @@ public class ErrorViewController implements ErrorController {
 	public String handleError(HttpServletRequest request, Model model) {
 		Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
 		Object mensaje = request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
-		if(mensaje.toString().isBlank()) {
+		if(mensaje == null || mensaje.toString().isBlank()) {
 			mensaje = "Ocurrió un error inesperado en el servidor.";
 		}
+		if(status == null) status = 500;
 		
 		model.addAttribute("errorMensaje", mensaje);
 		model.addAttribute("errorCode", status);

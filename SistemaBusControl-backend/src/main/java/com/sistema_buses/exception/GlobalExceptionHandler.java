@@ -83,7 +83,7 @@ public class GlobalExceptionHandler {
         }else {
         	problema.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
+        
         return problema;
     }
 }

@@ -169,6 +169,19 @@
                 window.location.reload(); 
             }
         });
+		document.addEventListener('DOMContentLoaded', () => {
+			setInterval(() => {
+				fetch("/dashboard/validar")
+				.catch(error => {
+					window.location.href = "/login";
+				})
+				.then(e => {
+					if(e.redirected){
+						window.location.href = "/login";
+					}
+				})
+			}, 5000)
+		});
     </script>
 
 </body>

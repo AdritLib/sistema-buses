@@ -12,7 +12,7 @@
             </a>
             <div>
                 <h1 class="h3 fw-bold mb-0">Tu Perfil</h1>
-                <p class="text-muted mb-0">Completa los datos corporativos para dar acceso al sistema.</p>
+                <p class="text-muted mb-0">Estos son sus datos personales registrados actualmente.</p>
             </div>
         </div>
 
@@ -43,7 +43,6 @@
                         <div class="col-md-4">
                             <label class="form-label fw-semibold text-secondary">Número de Doc.</label>
                             <input type="text" class="form-control bg-light" th:field="*{numDocumento}" id="numDocumento" disabled>
-                            <div class="form-text text-muted" id="docHelp" style="font-size: 0.8rem;">Seleccione un tipo de documento.</div>
                         </div>
 
                         <div class="col-md-4">
@@ -74,69 +73,6 @@
                 </form>
             </div>
         </div>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const tipoDoc = document.getElementById('tipoDocumento');
-                const numDoc = document.getElementById('numDocumento');
-                const telefono = document.getElementById('telefono');
-                const docHelp = document.getElementById('docHelp');
-
-                function aplicarReglasDocumento() {
-                    const tipo = tipoDoc.value;
-                    
-                    if (tipo === 'DNI') {
-                        numDoc.setAttribute('maxlength', '8');
-                        numDoc.setAttribute('minlength', '8');
-                        numDoc.setAttribute('pattern', '[0-9]{8}');
-                        numDoc.setAttribute('title', 'El DNI debe tener exactamente 8 números.');
-                        docHelp.textContent = "Exactamente 8 dígitos numéricos.";
-                    } else if (tipo === 'CARNET_EXTRANJERO') {
-                        numDoc.setAttribute('maxlength', '12');
-                        numDoc.setAttribute('minlength', '9');
-                        numDoc.setAttribute('pattern', '[A-Za-z0-9]{9,12}');
-                        numDoc.setAttribute('title', 'El CE debe tener entre 9 y 12 caracteres (Letras y Números).');
-                        docHelp.textContent = "Entre 9 y 12 caracteres alfanuméricos.";
-                    } else if (tipo === 'PASAPORTE') {
-                        numDoc.setAttribute('maxlength', '12');
-                        numDoc.setAttribute('minlength', '6');
-                        numDoc.setAttribute('pattern', '[A-Za-z0-9]{6,12}'); 
-                        numDoc.setAttribute('title', 'El Pasaporte debe tener entre 6 y 12 caracteres (Letras y Números).');
-                        docHelp.textContent = "Entre 6 y 12 caracteres alfanuméricos.";
-                    }
-                }
-
-                tipoDoc.addEventListener('change', function() {
-                    numDoc.value = ''; 
-                    aplicarReglasDocumento();
-                });
-
-                numDoc.addEventListener('input', function (e) {
-                    if (tipoDoc.value === 'DNI') {
-                        this.value = this.value.replace(/[^0-9]/g, '');
-                    } else if (tipoDoc.value === 'CARNET_EXTRANJERO' || tipoDoc.value === 'PASAPORTE') {
-                        this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-                    }
-                });
-
-                telefono.setAttribute('maxlength', '9');
-                telefono.setAttribute('minlength', '9');
-                telefono.setAttribute('pattern', '9[0-9]{8}');
-                telefono.setAttribute('title', 'El teléfono debe empezar con 9 y tener exactamente 9 dígitos.');
-
-                telefono.addEventListener('input', function (e) {
-                    let valor = this.value.replace(/[^0-9]/g, '');
-                    
-                    if (valor.length > 0 && valor.charAt(0) !== '9') {
-                        valor = ''; 
-                    }
-                    
-                    this.value = valor.substring(0, 9);
-                });
-
-                if(tipoDoc.value) aplicarReglasDocumento();
-            });
-        </script>
     </div>
 </body>
 </html>

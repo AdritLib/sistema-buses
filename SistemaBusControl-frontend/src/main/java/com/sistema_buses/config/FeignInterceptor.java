@@ -18,13 +18,15 @@ public class FeignInterceptor implements RequestInterceptor{
         
         if (session == null) return;
         String token = (String) session.getAttribute("token");
-        String correlationId = (String) session.getAttribute("X-Correlation-id");
+        Long expiresAt = (Long) session.getAttribute("expires-in");
+        
         if (token != null) {
             template.header("Authorization", "Bearer " + token);
             
         }
-        if(correlationId != null) {
-        	template.header("X-Correlation-Id", correlationId);
+        //template.header("X-Correlation-Id", correlationId);
+        if(expiresAt != null) {
+        	template.header("expires-in", expiresAt.toString());
         }
 	}
 }

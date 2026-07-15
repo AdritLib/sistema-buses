@@ -97,4 +97,10 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponse> actualizar(@PathVariable Long id, @RequestBody UsuarioRequest request){
     	return ResponseEntity.ok(usuarioService.actualizar(id, request));
     }
+    
+    
+    @GetMapping("/validar")
+    public ResponseEntity<Void> validar(){
+    	return ResponseEntity.ok().build();
+    }
 }

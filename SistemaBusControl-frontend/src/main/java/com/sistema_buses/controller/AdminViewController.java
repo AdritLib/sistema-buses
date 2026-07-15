@@ -64,7 +64,6 @@ public class AdminViewController {
         int totalBuses = 0, totalPersonal = 0, totalParaderos = 0, totalEstaciones = 0;
 
         try {
-
             List<VehiculoResponse> buses = vehiculoClient.listarVehiculos(0);
             if (buses != null) totalBuses = buses.size();
 

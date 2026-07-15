@@ -31,6 +31,7 @@
 						<th>Hora Inicio</th>
 						<th>Hora Fin</th>
 						<th>Fecha</th>
+						<th>Estado</th>
 						<th>Acciones</th>
 					</tr>
 				</thead>
@@ -48,6 +49,13 @@
 						<td th:text="${a.horaInicio}"></td>
 						<td th:text="${a.horaFin}"></td>
 						<td th:text="${#temporals.format(a.fecha, 'dd/MM/yyyy')}"></td>
+						<td>
+							<span
+	                           th:class="${a.estado == 'ACTIVO'? 'badge text-bg-warning px-3 py-1.5 rounded-pill fw-bold' :
+	                                      (a.estado == 'INACTIVO' ? 'badge bg-danger-subtle text-danger px-3 py-1.5 rounded-pill fw-bold' :
+	                                      'badge bg-secondary-subtle text-secondary px-3 py-1.5 rounded-pill fw-bold')}"
+							 th:text="${a.estado}">-</span>
+						</td>
 
 						<td>
 							<a th:href="@{/supervisor/asignaciones/form(id=${a.id})}"

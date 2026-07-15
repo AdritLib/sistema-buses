@@ -13,8 +13,7 @@ public class GlobalExceptionHandler {
     public String handleFeignException(FeignException e, RedirectAttributes redirect) {
     	redirect.addFlashAttribute("errorTitulo", "Error al contactar con la aplicación");
     	redirect.addFlashAttribute("errorMensaje", e.contentUTF8());
-    	redirect.addFlashAttribute("errorEstatus", e.status());
-
+    	redirect.addFlashAttribute("errorCode", e.status());
         return "redirect:/error";
     }
     
@@ -22,8 +21,7 @@ public class GlobalExceptionHandler {
     public String handleProblemDetailException(ProblemaDetallesException e, RedirectAttributes redirect) {
     	redirect.addFlashAttribute("errorTitulo", e.getProblemDetail().getTitle());
     	redirect.addFlashAttribute("errorMensaje", e.getProblemDetail().getDetail());
-    	redirect.addFlashAttribute("errorEstatus", 500);
-
+    	redirect.addFlashAttribute("errorCode", 500);
         return "redirect:/error";
     }
 }

@@ -3,6 +3,8 @@ package com.sistema_buses.dto.asignacion;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.sistema_buses.enums.GenericoEstado;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +15,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class AsignacionResponse {
-
 	private Long id;
 
 	private Long conductorID;
@@ -28,4 +29,6 @@ public class AsignacionResponse {
 	private LocalTime horaInicio;
 	private LocalTime horaFin;
 	private LocalDate fecha;
+	
+	private GenericoEstado estado;
 }

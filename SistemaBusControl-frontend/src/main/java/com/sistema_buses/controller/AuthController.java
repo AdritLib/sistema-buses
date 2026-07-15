@@ -42,8 +42,8 @@ public class AuthController {
                                 Model model) {
         try {
             LoginResponse loginResponse = authClient.login(loginData);
-            String token = loginResponse.getToken();
-            session.setAttribute("token", token);
+            session.setAttribute("token", loginResponse.getToken());
+            session.setAttribute("expires-in", loginResponse.getExpiresIn());
             
             UsuarioCompletoResponse perfilResponse = usuarioClient.obtenerPerfil();
             
@@ -64,6 +64,7 @@ public class AuthController {
         } catch (ProblemaDetallesException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         } catch (Exception e) {
+        	e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Ocurrio un error en la aplicación.");
         }
         return "redirect:/login";
