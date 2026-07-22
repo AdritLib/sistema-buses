@@ -20,13 +20,13 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AutenticacionFiltro jwtAuthenticationFilter;
     private final AutenticacionPuntoAcceso puntoAcceso;
 
     @Bean
@@ -56,6 +56,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of("http://localhost:5500"));
         configuration.setAllowedMethods(List.of("GET","POST"));
         configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        //configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 

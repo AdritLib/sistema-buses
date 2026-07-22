@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class EstacionRequest {
     private String nombre;
     private String ubicacion;
-    private Long supervisorId; 
+    private Long supervisorId;
+    private String estado;
 }

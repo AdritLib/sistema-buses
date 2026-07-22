@@ -299,6 +299,10 @@ public class RecorridoServiceImpl implements RecorridoService {
 				.horaInicio(guardado.getHoraInicio())
 				.build();
 	}
+	
+	public Recorrido buscarPorId(Long recorridoId) {
+		return recorridoRepository.findById(recorridoId).orElseThrow();
+	}
 
 	private Recorrido obtenerRecorridoAutorizado(Long recorridoID) {
 		Recorrido recorrido = recorridoRepository.findById(recorridoID)

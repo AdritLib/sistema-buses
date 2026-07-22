@@ -1,6 +1,6 @@
 package com.sistema_buses.client;
 
-import com.sistema_buses.config.AppFrontConfig;
+import com.sistema_buses.config.ApplicacionConfig;
 import com.sistema_buses.dto.paradero.ParaderoRequest;
 import com.sistema_buses.dto.paradero.ParaderoResponse;
 
@@ -8,7 +8,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@FeignClient(name = "paradero-client", url = "${backend.base-url}/api", configuration = AppFrontConfig.class)
+@FeignClient(name = "paradero-client", url = "${backend.base-url}/api", configuration = ApplicacionConfig.class)
 public interface ParaderoClient {
 
     @GetMapping("/paradero")

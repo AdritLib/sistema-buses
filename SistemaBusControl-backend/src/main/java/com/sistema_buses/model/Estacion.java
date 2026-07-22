@@ -1,7 +1,11 @@
 package com.sistema_buses.model;
 
+import com.sistema_buses.enums.GenericoEstado;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,9 +37,12 @@ public class Estacion {
 	@ManyToOne(optional = true)
 	@JoinColumn(name = "usuario_id", nullable = true)
 	private Usuario supervisor;
+	
+	@Enumerated(EnumType.STRING)
+	private GenericoEstado estado;
 
 	@Override
 	public String toString() {
-		return "[id=" + id + ", nombre=" + nombre + ", ubicacion=" + ubicacion + ", supervisor=" + supervisor.getId() + "]";
+		return "[id=" + id + ", nombre=" + nombre + ", ubicacion=" + ubicacion + ", supervisor=" + (supervisor == null ? null : supervisor.getId()) + ", estado=" + estado + "]";
 	}
 }

@@ -17,7 +17,7 @@
                     <button type="submit" class="btn btn-secondary px-3" style="border-radius: 8px;"><i class="bi bi-search"></i></button>
                     <a th:if="${param.idBuscado}" th:href="@{/admin/estaciones}" class="btn btn-outline-danger px-3" style="border-radius: 8px;"><i class="bi bi-x-lg"></i></a>
                 </form>
-                <a th:href="@{/admin/estaciones/nuevo}" class="btn btn-primary fw-semibold px-4 rounded-pill shadow-sm">
+                <a th:href="@{/admin/estaciones/form}" class="btn btn-primary fw-semibold px-4 rounded-pill shadow-sm">
                     <i class="bi bi-building-fill me-2"></i> Nueva Estación
                 </a>
             </div>
@@ -33,8 +33,9 @@
                         <tr>
                             <th class="ps-4">ID</th>
                             <th>Nombre de la Estación</th>
-                            <th>Ubicación / Dirección</th>
-                            <th>Supervisor a Cargo</th>
+                            <th>Ubicación</th>
+                            <th>Supervisor</th>
+							<th>Estado</th>
                             <th class="text-center pe-4">Acciones</th>
                         </tr>
                     </thead>
@@ -48,12 +49,16 @@
                             <td th:text="${e.ubicacion}">Ubicación</td>
                             <td>
                                 <span class="badge bg-light text-dark border px-3 py-1.5" th:if="${e.supervisorId == null}">Sin Asignar</span>
-                                <span class="badge bg-info-subtle text-info border px-3 py-1.5" th:each="user : ${supervisores}" th:if="${user.id == e.supervisorId}">
-                                    <i class="bi bi-person-badge-fill me-1"></i> <span th:text="${user.nombre}">Supervisor</span>
-                                </span>
+                                <span th:if="${e.supervisorId != null}" th:text="${e.supervisorNombre}"></span>
                             </td>
+							<td>
+								<span th:class="${e.estado == 'ACTIVO' ? 'badge text-bg-warning px-3 py-1.5 rounded-pill fw-bold' :
+	                                          (e.estado == 'INACTIVO' ? 'badge bg-secondary-subtle text-secondary px-3 py-1.5 rounded-pill fw-bold' :
+	                                          'badge bg-success-subtle text-success px-3 py-1.5 rounded-pill fw-bold')}"
+								 th:text="${e.estado}"></span>
+							</td>
                             <td class="text-center pe-4">
-                                <a th:href="@{/admin/estaciones/editar/{id}(id=${e.id})}" class="btn btn-sm btn-light border text-primary"><i class="bi bi-pencil-square"></i></a>
+                                <a th:href="@{/admin/estaciones/form(id=${e.id})}" class="btn btn-sm btn-light border text-primary"><i class="bi bi-pencil-square"></i></a>
                             </td>
                         </tr>
                     </tbody>

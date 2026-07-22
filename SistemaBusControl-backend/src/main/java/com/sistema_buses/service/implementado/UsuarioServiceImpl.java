@@ -13,6 +13,7 @@ import com.sistema_buses.dto.usuario.UsuarioHabilitacionRequest;
 import com.sistema_buses.dto.usuario.UsuarioRequest;
 import com.sistema_buses.dto.usuario.UsuarioResponse;
 import com.sistema_buses.enums.RegistroAccion;
+import com.sistema_buses.enums.Roles;
 import com.sistema_buses.exception.ErrorDeNegocioException;
 import com.sistema_buses.exception.RolNoEncontradoException;
 import com.sistema_buses.exception.UsuarioNoEncontradoException;
@@ -38,8 +39,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public UsuarioCompletoResponse obtenerPerfil(@AuthenticationPrincipal UserDetailsImpl detalles) {
-        if(detalles == null || detalles.getUser() == null) throw new UsuarioNoEncontradoException();
-        return usuarioMapper.toCompleto(detalles.getUser());
+        if(detalles == null || detalles.user() == null) throw new UsuarioNoEncontradoException();
+        return usuarioMapper.toCompleto(detalles.user());
     }
 	@Override
 	public List<UsuarioResponse> listar(int pagina, int tamanio) {
@@ -96,8 +97,17 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return usuarioMapper.toResponse(usuario);
 	}
 	
-	private Usuario buscarPorId(Long id) {
+	public Usuario buscarPorId(Long id) {
 		if(id == null) throw new ErrorDeNegocioException("No puede usar una ID nula.");
-		return usuarioRepository.findById(id).orElseThrow(UsuarioNoEncontradoException::new);
+		Usuario usuario = usuarioRepository.findById(id).orElseThrow(UsuarioNoEncontradoException::new);
+		if(!usuario.isActivo()) throw new ErrorDeNegocioException("El usuario ID="+id+" no esta activo.");
+		
+		return usuario;
+	}
+	public Usuario buscarPorIdYRol(Long id, Roles rol) {
+		if(!usuarioRepository.existsByIdAndRolNombre(id, rol)) throw new ErrorDeNegocioException("El usuario ID="+id+" no tiene el rol: "+rol.toString());
+		Usuario encontrado = buscarPorId(id);
+		System.out.println("Si funciona buscar Por Id desde Service");
+		return encontrado;
 	}
 }

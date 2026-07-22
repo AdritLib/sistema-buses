@@ -33,8 +33,8 @@ public class IncidenciaController {
 	@Operation(summary = "Listar incidencias", description = "Devuelve una lista de incidencias.")
 	@GetMapping
 	@HasSupervisorOrAdminRol
-	public ResponseEntity<List<IncidenciaResponse>> listar(@RequestParam int pagina){
-		return ResponseEntity.ok(incidenciaService.listar(pagina));
+	public ResponseEntity<List<IncidenciaResponse>> listar(@RequestParam int pagina, @RequestParam(defaultValue = "10") int size){
+		return ResponseEntity.ok(incidenciaService.listar(pagina, size));
 	}
 	
 	@Operation(summary = "Obtener incidencia por ID", description = "Devuelve una incidencia por ID.")

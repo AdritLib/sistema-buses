@@ -2,16 +2,15 @@ package com.sistema_buses.exception;
 
 import org.springframework.http.ProblemDetail;
 
+import lombok.Getter;
+
+@SuppressWarnings("serial")
+@Getter
 public class ProblemaDetallesException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
-	private final ProblemDetail problemDetail;
+    private ProblemDetail problemDetail;
 
-    public ProblemaDetallesException(ProblemDetail problemDetail) {
-        super(problemDetail.getDetail());
-        this.problemDetail = problemDetail;
-    }
-
-    public ProblemDetail getProblemDetail() {
-        return problemDetail;
-    }
+	public ProblemaDetallesException(ProblemDetail problem) {
+		super(problem.getDetail());
+		this.problemDetail = problem;
+	}
 }

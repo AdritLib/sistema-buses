@@ -25,7 +25,7 @@ public class RabbitProducer {
 		registro.setAccion(accion);
 		registro.setEntidadAfectada(entidadAfectada);
 		registro.setDescripcion(descripcion);
-		registro.setUsuarioID(user.getUser().getId());
+		registro.setUsuarioID(user.user().getId());
 		registro.setFecha(LocalDateTime.now());
 		
 		template.convertAndSend(RabbitMQConfig.COLA, registro);

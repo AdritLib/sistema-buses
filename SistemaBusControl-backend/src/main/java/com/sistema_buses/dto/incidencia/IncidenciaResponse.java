@@ -2,6 +2,8 @@ package com.sistema_buses.dto.incidencia;
 
 import java.time.LocalDateTime;
 
+import com.sistema_buses.enums.RecorridoEstado;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,5 +28,5 @@ public class IncidenciaResponse {
 	private String ruta;
 	private String placa;
 	private String vehiculo;
-	private String estadoRecorrido;
+	private RecorridoEstado estadoRecorrido;
 }

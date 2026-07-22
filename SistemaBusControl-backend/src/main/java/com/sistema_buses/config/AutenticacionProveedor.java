@@ -13,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AuthenticatorProvider implements AuthenticationProvider {
+public class AutenticacionProveedor implements AuthenticationProvider {
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -28,7 +28,7 @@ public class AuthenticatorProvider implements AuthenticationProvider {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("Invalid username or password");
+            throw new BadCredentialsException("Nombre o clave invalida.");
         }
 
         return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());

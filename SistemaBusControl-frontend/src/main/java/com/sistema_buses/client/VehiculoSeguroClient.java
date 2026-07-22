@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-import com.sistema_buses.config.AppFrontConfig;
+import com.sistema_buses.config.ApplicacionConfig;
 import com.sistema_buses.dto.vehiculo.VehiculoSeguroRequest;
 import com.sistema_buses.dto.vehiculo.VehiculoSeguroResponse;
 
-@FeignClient(name = "vehiculo-seguro-client", url = "${backend.base-url}/api/vehiculo/seguro", configuration = AppFrontConfig.class)
+@FeignClient(name = "vehiculo-seguro-client", url = "${backend.base-url}/api/vehiculo/seguro", configuration = ApplicacionConfig.class)
 public interface VehiculoSeguroClient {
 
 	@GetMapping

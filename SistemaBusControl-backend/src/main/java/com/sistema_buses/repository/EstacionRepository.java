@@ -17,15 +17,27 @@ public interface EstacionRepository extends JpaRepository<Estacion, Long>{
 	
 	@Query(
 			value = """
-			SELECT NEW com.sistema_buses.dto.EstacionResponse(e.id, e.nombre, e.ubicacion, s.id) 
-			FROM Estacion e LEFT JOIN e.supervisor s
+			SELECT NEW com.sistema_buses.dto.EstacionResponse(
+					e.id, 
+					e.nombre, 
+					e.ubicacion, 
+					s.id, 
+					s.nombre,
+					e.estado) 
+			FROM Estacion e INNER JOIN e.supervisor s
 			""",
 			countQuery = "SELECT count(r) FROM Estacion r")
 	Page<EstacionResponse> listar(Pageable page);
 	
 	@Query("""
-			SELECT NEW com.sistema_buses.dto.EstacionResponse(e.id, e.nombre, e.ubicacion, s.id) 
-			FROM Estacion e LEFT JOIN e.supervisor s WHERE e.id = :estacionId
+			SELECT NEW com.sistema_buses.dto.EstacionResponse(
+					e.id, 
+					e.nombre, 
+					e.ubicacion, 
+					s.id, 
+					s.nombre,
+					e.estado) 
+			FROM Estacion e INNER JOIN e.supervisor s WHERE e.id = :estacionId
 			""")
 	Optional<EstacionResponse> encontrarPorID(Long estacionId);
 	

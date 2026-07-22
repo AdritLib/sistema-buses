@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-import com.sistema_buses.config.AppFrontConfig;
+import com.sistema_buses.config.ApplicacionConfig;
 import com.sistema_buses.dto.recorrido.RecorridoRequest;
 import com.sistema_buses.dto.recorrido.RecorridoResponse;
 
-@FeignClient(name = "recorrido", url = "${backend.base-url}/api", configuration = AppFrontConfig.class)
+@FeignClient(name = "recorrido", url = "${backend.base-url}/api", configuration = ApplicacionConfig.class)
 public interface RecorridoClient {
 
 	@GetMapping("/recorrido")

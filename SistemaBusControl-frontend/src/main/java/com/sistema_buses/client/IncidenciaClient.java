@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.sistema_buses.config.AppFrontConfig;
+import com.sistema_buses.config.ApplicacionConfig;
 import com.sistema_buses.dto.incidencia.IncidenciaConductorRequest;
 import com.sistema_buses.dto.incidencia.IncidenciaRequest;
 import com.sistema_buses.dto.incidencia.IncidenciaResponse;
 
-@FeignClient(name = "incidencia-client", url = "${backend.base-url}/api/incidencia", configuration = AppFrontConfig.class)
+@FeignClient(name = "incidencia-client", url = "${backend.base-url}/api/incidencia", configuration = ApplicacionConfig.class)
 public interface IncidenciaClient {
 
     @GetMapping

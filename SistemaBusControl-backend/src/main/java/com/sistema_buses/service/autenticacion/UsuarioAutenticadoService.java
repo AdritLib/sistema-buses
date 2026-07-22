@@ -20,16 +20,16 @@ public class UsuarioAutenticadoService {
     }
 
     public Long obtenerUsuarioID() {
-        return obtenerDetalles().getUser().getId();
+        return obtenerDetalles().user().getId();
     }
 
     public boolean esAdmin() {
-        return obtenerDetalles().getUser().getRol().getNombre() == Roles.ADMIN;
+        return obtenerDetalles().user().getRol().getNombre() == Roles.ADMIN;
     }
 
     public void validarMismoUsuarioOAdmin(Long usuarioID) {
         if (!esAdmin() && !obtenerUsuarioID().equals(usuarioID)) {
-            throw new AccessDeniedException("No puedes consultar la operación de otro conductor.");
+            throw new AccessDeniedException("No tienes acceso a esa consulta.");
         }
     }
 }

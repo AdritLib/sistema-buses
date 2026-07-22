@@ -8,19 +8,15 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sistema_buses.config.ApplicationConfig;
 import com.sistema_buses.dto.incidencia.IncidenciaConductorRequest;
 import com.sistema_buses.dto.incidencia.IncidenciaRequest;
 import com.sistema_buses.dto.incidencia.IncidenciaResponse;
-import com.sistema_buses.exception.ErrorDeNegocioException;
-import com.sistema_buses.enums.RecorridoEstado;
+import com.sistema_buses.exception.IncidenciaNoEncontradoException;
+import com.sistema_buses.mapper.IncidenciaMapper;
 import com.sistema_buses.enums.RegistroAccion;
 import com.sistema_buses.model.Incidencia;
 import com.sistema_buses.model.Recorrido;
-import com.sistema_buses.model.Usuario;
 import com.sistema_buses.repository.IncidenciaRepository;
-import com.sistema_buses.repository.RecorridoRepository;
-import com.sistema_buses.repository.UsuarioRepository;
 import com.sistema_buses.service.IncidenciaService;
 import com.sistema_buses.service.autenticacion.UsuarioAutenticadoService;
 import com.sistema_buses.service.rabbitmq.RabbitProducer;
@@ -29,61 +25,44 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class IncidenciaServiceImpl implements IncidenciaService {
 	private final IncidenciaRepository incidenciaRepository;
-	private final UsuarioRepository usuarioRepository;
-	private final RecorridoRepository recorridoRepository;
 	private final UsuarioAutenticadoService usuarioAutenticadoService;
 	private final RabbitProducer producer;
-	private final ApplicationConfig config;
 	private final String entidadAfectada = "Incidencia";
+	private final IncidenciaMapper incidenciaMapper;
 	
 	@Override
-	public List<IncidenciaResponse> listar(int pagina) {
-		return incidenciaRepository
-				.findAllByOrderByFechaHoraSucesoDesc(PageRequest.of(pagina, config.registrosPorPagina()))
-				.stream()
-				.map(this::mapear)
-				.toList();
+	public List<IncidenciaResponse> listar(int pagina, int size) {
+		return incidenciaRepository.listarPorFechaHoraSucesoDesc(PageRequest.of(pagina, size)).toList();
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public List<IncidenciaResponse> listarParaConductor(Long usuarioID, int pagina, int size) {
 		usuarioAutenticadoService.validarMismoUsuarioOAdmin(usuarioID);
-		int paginaSegura = Math.max(pagina, 0);
-		int sizeSeguro = Math.min(Math.max(size, 1), 50);
-		return incidenciaRepository
-				.findByUsuarioIdOrderByFechaHoraSucesoDesc(
-						usuarioID,
-						PageRequest.of(paginaSegura, sizeSeguro))
-				.stream()
-				.map(this::mapear)
-				.toList();
+		return incidenciaRepository.listarPorFechaHoraSucesoDesc(PageRequest.of(pagina, size)).toList();
 	}
 
 	@Override
-	public IncidenciaResponse encontrarPorID(Long incidencia) {
-		return incidenciaRepository.findById(incidencia).map(this::mapear).orElseThrow();
+	public IncidenciaResponse encontrarPorID(Long incidenciaId) {
+		return incidenciaRepository.encontrarPorID(incidenciaId).orElseThrow(IncidenciaNoEncontradoException::new);
 	}
 
 	@Override
-	@Transactional
 	public IncidenciaResponse registrar(IncidenciaRequest request) {
-		return guardar(null, request, RegistroAccion.INSERTAR);
+		return guardar(null, request);
 	}
 
 	@Override
-	@Transactional
 	public IncidenciaResponse registrarComoConductor(IncidenciaConductorRequest request) {
 		Long usuarioID = usuarioAutenticadoService.obtenerUsuarioID();
-		Recorrido recorrido = recorridoRepository.findById(request.getRecorridoID())
-				.orElseThrow(() -> new ErrorDeNegocioException("No hay recorrido activo para registrar la incidencia."));
-		validarRecorridoActivo(recorrido);
+		
+		Recorrido recorrido = incidenciaMapper.recorrido(request.getRecorridoID());
 		if (!usuarioAutenticadoService.esAdmin()
 				&& (recorrido.getAsignacion().getConductor() == null
 						|| !usuarioID.equals(recorrido.getAsignacion().getConductor().getId()))) {
-			throw new AccessDeniedException("No puedes reportar incidencias en un recorrido ajeno.");
+			throw new AccessDeniedException("No puedes reportar incidencias de un recorrido ajeno.");
 		}
 
 		IncidenciaRequest requestInterno = IncidenciaRequest.builder()
@@ -92,84 +71,27 @@ public class IncidenciaServiceImpl implements IncidenciaService {
 				.descripcion(request.getDescripcion())
 				.fechaHoraSuceso(LocalDateTime.now())
 				.build();
-		return guardar(null, requestInterno, RegistroAccion.INCIDENCIA_REGISTRADA);
+		return guardar(null, requestInterno);
 	}
 
 	@Override
-	@Transactional
 	public IncidenciaResponse actualizar(Long incidencia, IncidenciaRequest request) {
-		return guardar(incidencia, request, RegistroAccion.ACTUALIZAR);
+		return guardar(incidencia, request);
 	}
 	
-	private IncidenciaResponse guardar(Long incidenciaID, IncidenciaRequest request, RegistroAccion accion) {
-		Incidencia entidad;
-		if(incidenciaID == null) {
-			entidad = new Incidencia();
-		}else {
-			entidad = incidenciaRepository.findById(incidenciaID).orElseThrow();
-		}
-		entidad.setFechaHoraSuceso(request.getFechaHoraSuceso() != null
-				? request.getFechaHoraSuceso() : LocalDateTime.now());
-		entidad.setDescripcion(request.getDescripcion());
+	@Transactional
+	public IncidenciaResponse guardar(Long incidenciaID, IncidenciaRequest request) {
+		Incidencia entidad = incidenciaMapper.toEntity(request);
+		RegistroAccion accion = RegistroAccion.INSERTAR;
 		
-		Usuario usuario = usuarioRepository.findById(request.getUsuarioID()).orElseThrow();
-		entidad.setUsuario(usuario);
-
-		Recorrido recorrido = recorridoRepository.findById(request.getRecorridoID())
-				.orElseThrow(() -> new ErrorDeNegocioException("No hay recorrido activo para registrar la incidencia."));
-		if (incidenciaID == null) {
-			validarRecorridoActivo(recorrido);
+		if(incidenciaID != null) {
+			accion = RegistroAccion.ACTUALIZAR;
 		}
-		entidad.setRecorrido(recorrido);
 		
 		Incidencia guardado = incidenciaRepository.save(entidad);
-		String descripcionEvento = accion == RegistroAccion.INCIDENCIA_REGISTRADA
-				? "recorrido=" + guardado.getRecorrido().getId()
-				: "Se " + accion.verbo() + " una incidencia";
-		producer.enviar(accion, descripcionEvento, entidadAfectada);
+		producer.enviar(accion, guardado.toString(), entidadAfectada);
 		
-		return mapear(guardado);
-	}
-
-	private IncidenciaResponse mapear(Incidencia incidencia) {
-		Recorrido recorrido = incidencia.getRecorrido();
-		return IncidenciaResponse.builder()
-				.usuarioID(incidencia.getUsuario().getId())
-				.recorridoID(recorrido.getId())
-				.id(incidencia.getId())
-				.fechaHoraSuceso(incidencia.getFechaHoraSuceso())
-				.descripcion(incidencia.getDescripcion())
-				.usuarioNombre(nombreConductor(incidencia))
-				
-				.ruta(recorrido.getAsignacion() != null && recorrido.getAsignacion().getRuta() != null
-						? recorrido.getAsignacion().getRuta().getNombre()
-						: null)
-				.placa(recorrido.getAsignacion() != null && recorrido.getAsignacion().getVehiculo() != null
-						? recorrido.getAsignacion().getVehiculo().getPlaca()
-						: null)
-				.vehiculo(recorrido.getAsignacion() != null && recorrido.getAsignacion().getVehiculo() != null
-						? recorrido.getAsignacion().getVehiculo().getMarca() + " "
-								+ recorrido.getAsignacion().getVehiculo().getModelo()
-						: null)
-				.estadoRecorrido(recorrido.getEstado() != null ? recorrido.getEstado().name() : null)
-				.build();
-	}
-
-	private void validarRecorridoActivo(Recorrido recorrido) {
-		if (recorrido.getEstado() != RecorridoEstado.EN_CURSO) {
-			throw new ErrorDeNegocioException("No hay recorrido activo para registrar la incidencia.");
-		}
-	}
-
-	private String nombreConductor(Incidencia incidencia) {
-		if (incidencia.getUsuario() != null && incidencia.getUsuario().getNombre() != null) {
-			return incidencia.getUsuario().getNombre();
-		}
-		Recorrido recorrido = incidencia.getRecorrido();
-		if (recorrido.getAsignacion() != null && recorrido.getAsignacion().getConductor() != null) {
-			return recorrido.getAsignacion().getConductor().getNombre();
-		}
-		return null;
+		return incidenciaMapper.toResponse(guardado);
 	}
 
 	@Override

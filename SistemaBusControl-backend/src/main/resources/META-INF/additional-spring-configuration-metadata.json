@@ -1,0 +1,17 @@
+{"properties": [
+	{
+	  "name": "security.jwt.secret-key",
+	  "type": "java.lang.String",
+	  "description": "The secret key for this project. Be careful, no share this!"
+	},
+	{
+		"name": "security.jwt.expiration-time",
+		"type": "java.lang.Long",
+		"description": "The expiration time for the tokens. In miliseconds."
+	},
+	{
+		"name": "aplicacion.registrosporpagina",
+		"type": "java.lang.Integer",
+		"description": "The maximun rows displayed by list."
+	}
+]}

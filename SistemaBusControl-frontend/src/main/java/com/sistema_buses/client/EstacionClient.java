@@ -1,6 +1,6 @@
 package com.sistema_buses.client;
 
-import com.sistema_buses.config.AppFrontConfig;
+import com.sistema_buses.config.ApplicacionConfig;
 import com.sistema_buses.dto.EstacionRequest;
 import com.sistema_buses.dto.EstacionResponse;
 
@@ -8,7 +8,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@FeignClient(name = "estacion-client", url = "${backend.base-url}/api", configuration = AppFrontConfig.class)
+@FeignClient(name = "estacion-client", url = "${backend.base-url}/api", configuration = ApplicacionConfig.class)
 public interface EstacionClient {
 
     @GetMapping("/estacion")

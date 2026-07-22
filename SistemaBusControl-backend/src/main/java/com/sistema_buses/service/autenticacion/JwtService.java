@@ -67,6 +67,16 @@ public class JwtService {
     public Long expiresIn(String token) {
     	return extractExpiration(token).getTime();
     }
+    
+    public boolean shouldTokenBeRenewed(String token) {
+        Date expiration = extractExpiration(token);
+        Date issuedAt = extractClaim(token, Claims::getIssuedAt);
+        
+        long totalDuration = expiration.getTime() - issuedAt.getTime();
+        long timeRemaining = expiration.getTime() - System.currentTimeMillis();
+        
+        return timeRemaining < (totalDuration / 2); 
+    }
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());

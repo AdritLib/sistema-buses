@@ -12,4 +12,6 @@ public class EstacionResponse {
     private String nombre;
     private String ubicacion;
     private Long supervisorId;
+    private String supervisorNombre;
+    private String estado;
 }

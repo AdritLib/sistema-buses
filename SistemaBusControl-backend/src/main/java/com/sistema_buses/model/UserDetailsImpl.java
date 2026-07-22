@@ -11,7 +11,7 @@ import java.util.List;
 
 public record UserDetailsImpl(Usuario user) implements UserDetails {
 
-	public Usuario getUser() {
+	public Usuario user() {
 		return user;
 	}
 	

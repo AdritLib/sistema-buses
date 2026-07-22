@@ -5,6 +5,7 @@ import com.sistema_buses.dto.usuario.UsuarioCambiarClaveRequest;
 import com.sistema_buses.dto.usuario.UsuarioLogin;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface AuthClient {
 
     @PostMapping("/ingresar")
-    LoginResponse login(@RequestBody UsuarioLogin loginRequest);
+    ResponseEntity<LoginResponse> login(@RequestBody UsuarioLogin loginRequest);
     
     @PostMapping("/cambiarClave")
     void cambiarClave(@RequestBody UsuarioCambiarClaveRequest request);

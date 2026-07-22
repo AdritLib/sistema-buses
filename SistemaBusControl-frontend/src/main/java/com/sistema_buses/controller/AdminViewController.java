@@ -398,27 +398,20 @@ public class AdminViewController {
     public String listarEstaciones(@RequestParam(defaultValue = "0") int pagina, 
                                    @RequestParam(required = false) Long idBuscado,
                                    HttpSession session, Model model) {
-        String token = (String) session.getAttribute("token");
-        if (token == null || !"ADMIN".equals(session.getAttribute("rol"))) return "redirect:/login";
-
         try {
-            //String cabeceraAuth = "Bearer " + token;
-            List<EstacionResponse> lista = new java.util.ArrayList<>();
+            List<EstacionResponse> lista = new ArrayList<>();
             
             if (idBuscado != null) {
                 try {
-                    lista.add(estacionClient.obtenerEstacionPorId(idBuscado));//(cabeceraAuth, idBuscado));
-                } catch(Exception e) { model.addAttribute("error", "No se encontró la Estación con ID " + idBuscado); }
+                    lista.add(estacionClient.obtenerEstacionPorId(idBuscado));
+                } catch(Exception e) { 
+                	model.addAttribute("error", "No se encontró la Estación con ID " + idBuscado); 
+                }
             } else {
                 lista = estacionClient.listarEstaciones(pagina, 10);
             }
             
-            List<UsuarioResponse> todosLosUsuarios = usuarioClient.listarUsuarios(0, 100);//(cabeceraAuth, 0, 100);
-            List<UsuarioResponse> soloSupervisores = todosLosUsuarios.stream()
-                    .filter(u -> u.getRol() != null && u.getRol().toUpperCase().contains("SUPERVISOR"))
-                    .collect(java.util.stream.Collectors.toList());
-
-            model.addAttribute("supervisores", soloSupervisores);
+            System.out.println(lista.toString());
             model.addAttribute("estaciones", lista);
             model.addAttribute("paginaActual", pagina);
             model.addAttribute("menuActivo", "estaciones");
@@ -429,62 +422,41 @@ public class AdminViewController {
         return "admin/estaciones-lista";
     }
 
-    @GetMapping("/estaciones/nuevo")
-    public String formularioEstacion(HttpSession session, Model model) {
+    @GetMapping("/estaciones/form")
+    public String formularioEstacion(@RequestParam(required = false) Long id, HttpSession session, Model model) {
         try {
-            List<UsuarioResponse> soloSupervisores = usuarioClient.listarSupervisores(0, 100);
-            model.addAttribute("supervisores", soloSupervisores);
+        	EstacionRequest request = new EstacionRequest();
+        	String modo = "crear";
+        	if(id != null) {
+        		EstacionResponse estacion = estacionClient.obtenerEstacionPorId(id);
+        		request.setNombre(estacion.getNombre());
+        		request.setUbicacion(estacion.getUbicacion());
+        		request.setSupervisorId(estacion.getSupervisorId());
+        		modo = "editar";
+        	}
+            List<UsuarioResponse> supervisores = usuarioClient.listarSupervisores(0, 100);
+            model.addAttribute("supervisores", supervisores);
+            model.addAttribute("estacionForm", request);
+            model.addAttribute("menuActivo", "estaciones");
+            model.addAttribute("nombreUsuario", session.getAttribute("nombreUsuario"));
+            model.addAttribute("modo", modo); 
         } catch (Exception ignored) {}
 
-        model.addAttribute("estacionForm", new EstacionRequest());
-        model.addAttribute("menuActivo", "estaciones");
-        model.addAttribute("nombreUsuario", session.getAttribute("nombreUsuario"));
         return "admin/estaciones-form";
     }
 
     @PostMapping("/estaciones/guardar")
-    public String guardarEstacion(@ModelAttribute("estacionForm") EstacionRequest request, HttpSession session) {
+    public String guardarEstacion(
+    		@RequestParam(required = false) Long id,
+    		@ModelAttribute("estacionForm") EstacionRequest request) {
         try {
-            estacionClient.registrarEstacion(request);
-            return "redirect:/admin/estaciones?exito=true";
-        } catch (Exception e) {
-            return "redirect:/admin/estaciones?error=true";
-        }
-    }
-
-    @GetMapping("/estaciones/editar/{id}")
-    public String editarEstacion(@PathVariable("id") Long id, HttpSession session, Model model) {
-        try {
-            EstacionResponse estacion = estacionClient.obtenerEstacionPorId(id);
-            
-            EstacionRequest form = new EstacionRequest();
-            form.setNombre(estacion.getNombre());
-            form.setUbicacion(estacion.getUbicacion());
-            form.setSupervisorId(estacion.getSupervisorId());
-
-            List<UsuarioResponse> todos = usuarioClient.listarUsuarios(0, 100);
-            List<UsuarioResponse> soloSupervisores = todos.stream()
-                    .filter(u -> u.getRol() != null && u.getRol().toUpperCase().contains("SUPERVISOR"))
-                    .collect(java.util.stream.Collectors.toList());
-
-            model.addAttribute("supervisores", soloSupervisores);
-            model.addAttribute("estacionForm", form);
-            model.addAttribute("esEdicion", true); 
-            model.addAttribute("estacionId", id);
-            model.addAttribute("menuActivo", "estaciones");
-            model.addAttribute("nombreUsuario", session.getAttribute("nombreUsuario"));
-            return "admin/estaciones-form";
-        } catch (Exception e) {
-            return "redirect:/admin/estaciones?error=true";
-        }
-    }
-
-    @PostMapping("/estaciones/actualizar/{id}")
-    public String actualizarEstacion(@PathVariable("id") Long id, @ModelAttribute("estacionForm") EstacionRequest request, HttpSession session) {
-        String token = (String) session.getAttribute("token");
-        if (token == null) return "redirect:/login";
-        try {
-            estacionClient.actualizarEstacion(id, request); //("Bearer " + token, id, request);
+        	System.out.println(id);
+        	/*
+        	if(id == null) {
+        		estacionClient.registrarEstacion(request);
+        	}else {
+        		estacionClient.actualizarEstacion(id, request);
+        	}*/
             return "redirect:/admin/estaciones?exito=true";
         } catch (Exception e) {
             return "redirect:/admin/estaciones?error=true";
@@ -492,7 +464,7 @@ public class AdminViewController {
     }
 
     @GetMapping("/estaciones/eliminar/{id}")
-    public String eliminarEstacion(@PathVariable("id") Long id, HttpSession session) {
+    public String eliminarEstacion(@PathVariable Long id, HttpSession session) {
         String token = (String) session.getAttribute("token");
         if (token == null || !"ADMIN".equals(session.getAttribute("rol"))) return "redirect:/login";
         try {
